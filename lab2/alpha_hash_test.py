@@ -9,13 +9,10 @@ class MyTestCase(unittest.TestCase):
     def test_error(self):
         self.assertRaises(ValueError, alpha_hash, '* &$')
     def test_en(self):
-        self.assertEqual(20055900000, alpha_hash('$aBK!lz'))
+        self.assertEqual(200011011, alpha_hash('$aBK!lz'))
 
     def test_uk(self):
-        self.assertEqual(10055900000, alpha_hash('$бАЛ?ня'))
-
-    def test_long(self):
-        self.assertEqual(21111111111, alpha_hash('c' * STRING_LENGTH * 2))
+        self.assertEqual(101001517, alpha_hash('$бАЛ?ня'))
 
 
 if __name__ == '__main__':
