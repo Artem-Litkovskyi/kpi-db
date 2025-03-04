@@ -1,17 +1,11 @@
-import os
-
-
-PATH_ALPHA = ('alphabets', 'codes')
-FILES_ALPHA = ('uk.txt', 'en.txt')
 STRING_LENGTH = 4
 PLACES_PER_CHAR = 2
 
-alphas = []
+ALPHAS = (
+    'АБВГҐДЕЄЖЗИІЇЙКЛМНОПРСТУФХЦЧШЩЬЮЯ',  # Uk
+    'ABCDEFGHIJKLMNOPQRSTUVWXYZ'  # En
+)
 
-
-def load_alpha():
-    global alphas
-    alphas = tuple(_read_alpha(x) for x in FILES_ALPHA)
 
 def alpha_hash(string: str):
     hash_value = 0
@@ -34,18 +28,14 @@ def alpha_hash(string: str):
 
 def _get_alpha_index(string: str):
     for c in string:
-        for i, a in enumerate(alphas):
+        for i, a in enumerate(ALPHAS):
             if c.upper() in a:
                 return i
     raise ValueError(
         'can\'t get a hash for the string \'%s\', because it doesn\'t contain any supported character' % string)
 
 def _get_char_code(char: str, alpha_index: int):
-    if char not in alphas[alpha_index]:
+    if char not in ALPHAS[alpha_index]:
         return -1
 
-    return alphas[alpha_index].index(char)
-
-def _read_alpha(filename):
-    with open(os.path.join(*PATH_ALPHA, filename), 'r') as f:
-        return f.read()
+    return ALPHAS[alpha_index].index(char)
