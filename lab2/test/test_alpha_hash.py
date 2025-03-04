@@ -1,5 +1,5 @@
 import unittest
-from alpha_hash import *
+from lab2.alpha_hash import *
 
 
 class MyTestCase(unittest.TestCase):

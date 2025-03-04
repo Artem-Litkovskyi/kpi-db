@@ -1,6 +1,6 @@
 import unittest
 
-from btree import *
+from lab2.btree import *
 
 
 TEST_NODES = BTreeNode(

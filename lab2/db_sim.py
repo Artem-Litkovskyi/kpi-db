@@ -68,6 +68,7 @@ class TelNumberDB:
         for row in map(lambda row_id: self.df.iloc[row_id], match_ids):
             yield row
 
+
 def random_tel():
     first = str(random.randint(1, 999))
     second = str(random.randint(1, 99)).zfill(2)

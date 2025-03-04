@@ -11,6 +11,7 @@ class BTreeNode:
             '[%s]' % ', '.join([type(child).__name__ for child in self.children])
         )
 
+
 # key1 <= x < key2
 class BTree:
     def __init__(self, key_hash_provider=hash, order=2):
@@ -118,7 +119,8 @@ class BTree:
 
             return self._split_the_node(node)
 
-    def _insert_into_leaf(self, leaf: BTreeNode, key_hash: int, value):
+    @staticmethod
+    def _insert_into_leaf(leaf: BTreeNode, key_hash: int, value):
         for i, k in enumerate(leaf.keys):
             if k < key_hash:
                 continue

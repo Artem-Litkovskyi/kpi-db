@@ -26,6 +26,7 @@ def alpha_hash(string: str):
 
     return hash_value
 
+
 def _get_alpha_index(string: str):
     for c in string:
         for i, a in enumerate(ALPHAS):
@@ -33,6 +34,7 @@ def _get_alpha_index(string: str):
                 return i
     raise ValueError(
         'can\'t get a hash for the string \'%s\', because it doesn\'t contain any supported character' % string)
+
 
 def _get_char_code(char: str, alpha_index: int):
     if char not in ALPHAS[alpha_index]:
