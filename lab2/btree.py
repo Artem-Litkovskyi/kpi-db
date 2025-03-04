@@ -154,6 +154,31 @@ class BTree:
         node.children = node.children[:self.order+1]
         return middle_key, right_half
 
+    def delete(self, key, value):
+        return self._delete_in_node(self.root, self.key_hash_provider(key), value)
+
+    def _delete_in_node(self, node: BTreeNode, key_hash: int, value):
+        if node.leaf:
+            for i, k in enumerate(node.keys):
+                if k != key_hash:
+                    continue
+                if len(node.children[i]) > 1:
+                    node.children[i].pop(i)
+                    break
+                node.keys.pop(i)
+                node.children.pop(i)
+                break
+            return len(node.keys) >= self.order
+
+        child_index = self._get_child_index_by_key(node, key_hash)
+        enough_keys = self._delete_in_node(node.children[child_index], key_hash, value)
+
+        if enough_keys:
+            return True
+
+        raise NotImplementedError()
+
+
     @staticmethod
     def _get_child_index_by_key(node: BTreeNode, key_hash: int):
         for i, k in enumerate(node.keys):

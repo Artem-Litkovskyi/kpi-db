@@ -138,6 +138,28 @@ class InsertionTest(unittest.TestCase):
         with self.subTest('Inserts that cause the root (not leaf) to split, creating a new root node'):
             self.assert_insertion(('100', '101', '102', '103', '104', '105'))
 
+class DeletionTest(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.tree = BTree(test_key_hash_provider, 2)
+        cls.tree.root = TEST_NODES
+
+    def assert_deletion(self, values):
+        for value in values:
+            key = get_key_for_value(value)
+            DeletionTest.tree.delete(key, value)
+            self.assertNotIn(value, DeletionTest.tree.search(key))
+
+    def test_deletion(self):
+        with self.subTest('Delete one of values with the same hash'):
+            self.assert_deletion(('2 7',))
+
+        with self.subTest('Delete that leaves enough keys'):
+            self.assert_deletion(('7',))
+
+        # with self.subTest('Delete that doesn\'t leave enough keys'):
+        #     self.assert_deletion(('3',))
+
 
 if __name__ == '__main__':
     unittest.main()
