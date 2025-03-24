@@ -5,10 +5,9 @@ from sqlalchemy import pool
 
 from alembic import context
 
-from sqlalchemy_utils import create_database, database_exists
-
-from domain.models import Base
-from repository.setup import ENGINE_URL
+from config import ENGINE_URL
+from domain import models
+from repository.db_setup import validate_database_existence
 
 
 # this is the Alembic Config object, which provides
@@ -26,7 +25,7 @@ config.set_main_option('sqlalchemy.url', ENGINE_URL)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-target_metadata = Base.metadata
+target_metadata = models.Base.metadata
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -72,11 +71,7 @@ def run_migrations_online() -> None:
         poolclass=pool.NullPool,
     )
 
-    if not database_exists(connectable.url):  # Checks for the first time
-        create_database(connectable.url)  # Create a new DB
-        print('New Database Created', database_exists(connectable.url))  # Verifies if database is there or not.
-    else:
-        print('Database Already Exists')
+    validate_database_existence(connectable)
 
     with connectable.connect() as connection:
         context.configure(

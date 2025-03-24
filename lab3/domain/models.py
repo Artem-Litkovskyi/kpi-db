@@ -1,6 +1,6 @@
 import enum
 from datetime import datetime
-from sqlalchemy import String, Enum, DateTime
+from sqlalchemy import String, inspect
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
 
 
@@ -24,7 +24,12 @@ class Compass16(enum.StrEnum):
 
 
 class Base(DeclarativeBase):
-    pass
+    def __repr__(self) -> str:
+        mapper = inspect(self.__class__)
+        return '%s(%s)' % (
+            self.__class__.__name__,
+            ', '.join('%s=%s' % (c.key, self.__dict__[c.key]) for c in mapper.attrs),
+        )
 
 
 class Weather(Base):
@@ -49,12 +54,3 @@ class Weather(Base):
     air_quality_pm10: Mapped[float]
     air_quality_us_epa_index: Mapped[int]
     air_quality_gb_defra_index: Mapped[int]
-
-    def __repr__(self) -> str:
-        return (
-            f'Weather(id={self.id}, country={self.country}, last_updated={self.last_updated}, \
-            wind_degree={self.wind_degree}, wind_kph={self.wind_kph}, wind_direction={self.wind_direction}, \
-            sunrise={self.sunrise}, \
-            air_quality_us_epa_index={self.air_quality_us_epa_index}, \
-            air_quality_gb_defra_index={self.air_quality_gb_defra_index})'
-        )
