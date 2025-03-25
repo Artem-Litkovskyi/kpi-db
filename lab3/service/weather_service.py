@@ -15,8 +15,14 @@ class WeatherService:
         with Session(self.engine) as session, session.begin():
             session.query(models.Weather).delete()
 
-            mapper = inspect(models.Weather)
-            session.bulk_insert_mappings(mapper, self.csv_service.get_all(mapper))
+            df = self.csv_service.get_all()
+
+            for model in [models.Weather, models.AirQuality]:
+                mapper = inspect(model)
+                session.bulk_insert_mappings(
+                    mapper,
+                    ({c.key: row[c.key] for c in mapper.column_attrs} for _, row in df.iterrows())
+                )
 
     # === READ ==============================================================================
     def view_all(self, page, per_page):
