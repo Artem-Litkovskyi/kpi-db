@@ -29,7 +29,13 @@ class TextUI:
         if air_quality:
             string += (
                 f'\t|\tair_quality: US EPA = {air_quality.air_quality_us_epa_index: >2}'
-                f', GB Defra = {air_quality.air_quality_gb_defra_index: >2}'
+            )
+
+        analytics = row.Weather.analytics
+
+        if analytics:
+            string += (
+                f'\t|\tanalytics: should go outside = {analytics.should_go_outside}'
             )
 
         print(string)

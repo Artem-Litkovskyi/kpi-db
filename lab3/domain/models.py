@@ -50,7 +50,13 @@ class Weather(Base):
     sunrise: Mapped[datetime]
 
     air_quality: Mapped['AirQuality'] = relationship(
-        backref=__tablename__,
+        backref='weather',
+        cascade='all, delete',
+        passive_deletes=True
+    )
+
+    analytics: Mapped['Analytics'] = relationship(
+        backref='weather',
         cascade='all, delete',
         passive_deletes=True
     )
@@ -69,3 +75,15 @@ class AirQuality(Base):
     air_quality_pm10: Mapped[float]
     air_quality_us_epa_index: Mapped[int]
     air_quality_gb_defra_index: Mapped[int]
+
+
+class Analytics(Base):
+    __tablename__ = 'analytics'
+
+    id: Mapped[int] = mapped_column(ForeignKey(Weather.id, ondelete='CASCADE'), primary_key=True)
+
+    should_go_outside: Mapped[bool] = mapped_column(default=True)
+
+    @staticmethod
+    def get_should_go_outside(wind_kph: float, air_quality_us_epa_index: int) -> bool:
+        return wind_kph < 80 and air_quality_us_epa_index <= 3
