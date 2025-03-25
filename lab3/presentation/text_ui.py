@@ -1,3 +1,5 @@
+from sqlalchemy.engine import Row
+
 from service.weather_service import WeatherService
 
 from config import CSV_PATH
@@ -14,6 +16,23 @@ class TextUI:
     @staticmethod
     def print_info(msg: str):
         print(f'\t(i) {msg}')
+
+    @staticmethod
+    def print_weather_short(row: Row):
+        string = (
+            f'\tid = {row.Weather.id: <5} {row.Weather.country: <30}{str(row.Weather.last_updated)}'
+            f'\t|\tweather: wind = {row.Weather.wind_kph: >4} kph'
+        )
+
+        air_quality = row.Weather.air_quality
+
+        if air_quality:
+            string += (
+                f'\t|\tair_quality: US EPA = {air_quality.air_quality_us_epa_index: >2}'
+                f', GB Defra = {air_quality.air_quality_gb_defra_index: >2}'
+            )
+
+        print(string)
 
     def main_menu(self):
         actions = (
@@ -70,13 +89,14 @@ class TextUI:
         )
 
         print('\n\n=== VIEW ALL ===')
+        print('Shows a short representation of the weather data')
         print('Actions:')
         for i, (action_name, _) in enumerate(actions):
             print(f'\t{i + 1}. {action_name}')
 
         print(f'Page {page+1}:')
-        for obj in self.weather_service.view_all(page, 20):
-            print('\t', obj)
+        for row in self.weather_service.view_all(page, 20):
+            self.print_weather_short(row)
 
         while True:
             try:

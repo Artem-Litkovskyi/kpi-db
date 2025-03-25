@@ -31,7 +31,7 @@ class CsvRepository:
         df['wind_direction'] = df['wind_direction'].apply(lambda x: models.Compass16(x.lower()))
 
         # Keep only necessary columns
-        df = df[(c.key for c in model_mapper.attrs)]
+        df = df[(c.key for c in model_mapper.column_attrs)]
 
         return df
 

@@ -1,7 +1,7 @@
 import enum
 from datetime import datetime
-from sqlalchemy import String, inspect
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import String, inspect, ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship, backref
 
 
 class Compass16(enum.StrEnum):
@@ -26,10 +26,13 @@ class Compass16(enum.StrEnum):
 class Base(DeclarativeBase):
     def __repr__(self) -> str:
         mapper = inspect(self.__class__)
-        return '%s(%s)' % (
+
+        string = '%s(%s)' % (
             self.__class__.__name__,
-            ', '.join('%s=%s' % (c.key, self.__dict__[c.key]) for c in mapper.attrs),
+            ', '.join('%s=%s' % (c.key, self.__dict__[c.key]) for c in mapper.column_attrs),
         )
+
+        return string
 
 
 class Weather(Base):
@@ -54,3 +57,30 @@ class Weather(Base):
     air_quality_pm10: Mapped[float]
     air_quality_us_epa_index: Mapped[int]
     air_quality_gb_defra_index: Mapped[int]
+
+    air_quality: Mapped['AirQuality'] = relationship(
+        backref=__tablename__,
+        cascade='all, delete',
+        passive_deletes=True
+    )
+
+
+class AirQuality(Base):
+    __tablename__ = 'air_quality'
+
+    id: Mapped[int] = mapped_column(ForeignKey(Weather.id, ondelete='CASCADE'), primary_key=True)
+
+    air_quality_carbon_monoxide: Mapped[float]
+    air_quality_ozone: Mapped[float]
+    air_quality_nitrogen_dioxide: Mapped[float]
+    air_quality_sulphur_dioxide: Mapped[float]
+    air_quality_pm2_5: Mapped[float]
+    air_quality_pm10: Mapped[float]
+    air_quality_us_epa_index: Mapped[int]
+    air_quality_gb_defra_index: Mapped[int]
+
+
+if __name__ == '__main__':
+    mapper = inspect(Weather)
+    print([c.key for c in mapper.column_attrs])
+    print([c.key for c in mapper.relationships])
