@@ -85,5 +85,8 @@ class Analytics(Base):
     should_go_outside: Mapped[bool] = mapped_column(default=True)
 
     @staticmethod
-    def get_should_go_outside(wind_kph: float, air_quality_us_epa_index: int) -> bool:
-        return wind_kph < 80 and air_quality_us_epa_index <= 3
+    def get_analytics_dict(**kwargs):
+        return {
+            'id': kwargs['id'],
+            'should_go_outside': kwargs['wind_kph'] < 80 and kwargs['air_quality_us_epa_index'] <= 3
+        }

@@ -37,7 +37,7 @@ def upgrade() -> None:
 
     op.bulk_insert(
         analytics,
-        [{'id': r[0], 'should_go_outside': models.Analytics.get_should_go_outside(r[1], r[2])} for r in res]
+        [models.Analytics.get_analytics_dict(id=r[0], wind_kph=r[1], air_quality_us_epa_index=r[2]) for r in res]
     )
 
 

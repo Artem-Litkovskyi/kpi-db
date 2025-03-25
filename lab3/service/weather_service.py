@@ -28,13 +28,7 @@ class WeatherService:
             mapper = inspect(models.Analytics)
             session.bulk_insert_mappings(
                 mapper,
-                ({
-                    'id': row['id'],
-                    'should_go_outside': models.Analytics.get_should_go_outside(
-                        row['wind_kph'],
-                        row['air_quality_us_epa_index']
-                    )
-                } for _, row in df.iterrows())
+                (models.Analytics.get_analytics_dict(**row) for _, row in df.iterrows())
             )
 
     # === READ ==============================================================================
