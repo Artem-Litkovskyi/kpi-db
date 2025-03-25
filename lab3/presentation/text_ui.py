@@ -10,6 +10,10 @@ class TextUI:
         self.weather_service = weather_service
 
     @staticmethod
+    def bool_to_yes_no(value: bool):
+        return ['No', 'Yes'][value]
+
+    @staticmethod
     def print_waring(msg: str):
         print(f'\t(!) {msg}')
 
@@ -17,34 +21,56 @@ class TextUI:
     def print_info(msg: str):
         print(f'\t(i) {msg}')
 
-    @staticmethod
-    def print_weather_short(row: Row):
+    def print_weather_short(self, row: Row):
         string = (
-            f'\tid = {row.Weather.id: <5} {row.Weather.country: <30}{str(row.Weather.last_updated)}'
-            f'\t|\tweather: wind = {row.Weather.wind_kph: >4} kph'
+            f'\tID = {row.Weather.id: <5} {row.Weather.country: <30}{str(row.Weather.last_updated)}'
+            f'\t|\tWeather: wind = {row.Weather.wind_kph: >4} kph'
         )
 
         air_quality = row.Weather.air_quality
 
         if air_quality:
             string += (
-                f'\t|\tair_quality: US EPA = {air_quality.air_quality_us_epa_index: >2}'
+                f'\t|\tAir Quality: US EPA = {air_quality.air_quality_us_epa_index: >2}'
             )
 
         analytics = row.Weather.analytics
 
         if analytics:
             string += (
-                f'\t|\tanalytics: should go outside = {analytics.should_go_outside}'
+                f'\t|\tAnalytics: should go outside = {self.bool_to_yes_no(analytics.should_go_outside)}'
             )
 
         print(string)
 
+    def print_weather_full(self, row: Row):
+        print('-'*50)
+        print(f'\tID = {row.Weather.id} | {row.Weather.country} | {str(row.Weather.last_updated)}')
+        print('\tWeather:')
+        print(f'\t\twind speed = {row.Weather.wind_kph} kph')
+        print(f'\t\twind direction = {row.Weather.wind_degree}° ({str(row.Weather.wind_direction).upper()})')
+        print(f'\t\tsunrise = {str(row.Weather.sunrise)}')
+
+        air_quality = row.Weather.air_quality
+        print('\tAir Quality:')
+        print(f'\t\tUS EPA index = {air_quality.air_quality_us_epa_index}')
+        print(f'\t\tGB Defra index = {air_quality.air_quality_gb_defra_index}')
+        print(f'\t\tCO = {air_quality.air_quality_carbon_monoxide}')
+        print(f'\t\tO3 = {air_quality.air_quality_ozone}')
+        print(f'\t\tNO2 = {air_quality.air_quality_nitrogen_dioxide}')
+        print(f'\t\tSO2 = {air_quality.air_quality_sulphur_dioxide}')
+        print(f'\t\tPM2.5 = {air_quality.air_quality_pm2_5}')
+        print(f'\t\tPM10 = {air_quality.air_quality_pm10}')
+
+        analytics = row.Weather.analytics
+        print('\tAnalytics:')
+        print(f'\t\tshould go outside = {self.bool_to_yes_no(analytics.should_go_outside)}')
+
     def main_menu(self):
         actions = (
             ('Load from CSV', self.load_from_csv_menu),
-            # ('Insert', None),
             ('View all', lambda: self.view_all_menu(0)),
+            ('Search by country and date', self.search_menu),
             ('Delete all', self.delete_all_menu),
             ('Delete by ID', self.delete_by_id_menu),
             ('Quit', quit),
@@ -119,6 +145,27 @@ class TextUI:
             break
 
         action_func()
+
+    def search_menu(self):
+        print('\n\n=== SEARCH ===')
+        print('Search full weather information by country and date')
+
+        country = input('Please, enter a country: ')
+        while True:
+            try:
+                year = int(input('Year: '))
+                month = int(input('Month: '))
+                day = int(input('Day: '))
+                break
+            except ValueError:
+                self.print_waring('This is not a number')
+                continue
+
+        print('Results:')
+        for row in self.weather_service.search(country, year, month, day):
+            self.print_weather_full(row)
+
+        self.main_menu()
 
     # === DELETE ============================================================================
     def delete_all_menu(self):

@@ -1,4 +1,4 @@
-from sqlalchemy import select, inspect
+from sqlalchemy import select, inspect, func
 from sqlalchemy.orm import Session
 
 from domain import models
@@ -32,8 +32,19 @@ class WeatherService:
             )
 
     # === READ ==============================================================================
-    def view_all(self, page, per_page):
+    def view_all(self, page: int, per_page: int):
         stmt = select(models.Weather).limit(per_page).offset(page * per_page)
+        with Session(self.weather_repository.engine) as session, session.begin():
+            for obj in session.execute(stmt):
+                yield obj
+
+    def search(self, country: str, year: int, month: int, day: int):
+        stmt = (
+            select(models.Weather)
+            .filter(models.Weather.country.ilike(country))
+            .filter(func.date(models.Weather.last_updated) == '%04i-%02i-%02i' % (year, month, day))
+        )
+
         with Session(self.weather_repository.engine) as session, session.begin():
             for obj in session.execute(stmt):
                 yield obj
