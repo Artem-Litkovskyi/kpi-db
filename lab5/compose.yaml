@@ -1,0 +1,17 @@
+services:
+  neo4j:
+    image: neo4j:latest
+    volumes:
+        - ./neo4j/logs:/logs
+        - ./neo4j/config:/config
+        - ./neo4j/data:/data
+        - ./neo4j/plugins:/plugins
+    environment:
+        - NEO4J_AUTH=neo4j/123neo4j
+    ports:
+      - "7474:7474"
+      - "7687:7687"
+    restart: always
+    user: '1000'
+    group_add:
+      - '1000'
